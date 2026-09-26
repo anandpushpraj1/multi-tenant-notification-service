@@ -1,0 +1,3 @@
+package com.example.notification.channel;
+import com.example.notification.common.ApiException; import com.example.notification.security.SecurityUtils; import org.springframework.http.HttpStatus; import org.springframework.stereotype.Service; import java.util.*;
+@Service public class ChannelConfigService{private final ChannelConfigRepository repo;public ChannelConfigService(ChannelConfigRepository r){repo=r;}public ChannelConfig upsert(ChannelType type,String json,boolean enabled){UUID t=SecurityUtils.tenant();ChannelConfig c=repo.findByTenantIdAndChannel(t,type).orElse(new ChannelConfig(t,type,json));c.setEnabled(enabled);return repo.save(c);}public List<ChannelConfig> list(){return repo.findByTenantId(SecurityUtils.tenant());}}
