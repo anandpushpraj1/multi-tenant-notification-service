@@ -20,3 +20,6 @@ server:
 app:
   dispatcher:
     interval-ms: ${DISPATCH_INTERVAL_MS:500}
+logging:
+  level:
+    org.springframework.security: TRACE

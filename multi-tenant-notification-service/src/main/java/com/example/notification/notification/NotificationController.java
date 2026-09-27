@@ -1,3 +1,49 @@
 package com.example.notification.notification;
-import jakarta.validation.Valid; import jakarta.validation.constraints.*; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.web.bind.annotation.*; import java.time.Instant; import java.util.*;
-@RestController @RequestMapping("/api/v1/notifications") @PreAuthorize("hasRole('TENANT_ADMIN')") public class NotificationController{private final NotificationService s;public NotificationController(NotificationService s){this.s=s;}public record Create(@NotNull UUID templateId,@NotBlank String recipient,@NotNull Map<String,Object> variables,Instant scheduledAt,String idempotencyKey){}@PostMapping public Notification create(@RequestBody @Valid Create r){return s.create(r.templateId(),r.recipient(),r.variables(),r.scheduledAt(),r.idempotencyKey());}@GetMapping public List<Notification> list(){return s.list();}@GetMapping("/{id}") public Notification get(@PathVariable UUID id){return s.get(id);}@PostMapping("/{id}/cancel") public Notification cancel(@PathVariable UUID id){return s.cancel(id);}}
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/v1/notifications")
+@PreAuthorize("hasRole('TENANT_ADMIN')")
+public class NotificationController {
+    private final NotificationService s;
+
+    public NotificationController(NotificationService s) {
+        this.s = s;
+    }
+
+    public record Create(
+            @NotNull UUID templateId,
+            @NotBlank String recipient,
+            @NotNull Map<String, Object> variables,
+            Instant scheduledAt,
+            String idempotencyKey) {}
+
+    @PostMapping
+    public Notification create(@RequestBody @Valid Create r) {
+        return s.create(
+                r.templateId(), r.recipient(), r.variables(), r.scheduledAt(), r.idempotencyKey());
+    }
+
+    @GetMapping
+    public List<Notification> list() {
+        return s.list();
+    }
+
+    @GetMapping("/{id}")
+    public Notification get(@PathVariable UUID id) {
+        return s.get(id);
+    }
+
+    @PostMapping("/{id}/cancel")
+    public Notification cancel(@PathVariable UUID id) {
+        return s.cancel(id);
+    }
+}

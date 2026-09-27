@@ -1,3 +1,42 @@
 package com.example.notification.delivery;
-import com.example.notification.audit.*; import com.example.notification.notification.*; import com.example.notification.common.ApiException; import com.example.notification.security.SecurityUtils; import org.springframework.http.HttpStatus; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.web.bind.annotation.*; import java.util.*;
-@RestController @RequestMapping("/api/v1/deliveries") @PreAuthorize("hasRole('TENANT_ADMIN')") public class DeliveryController{private final DeliveryAttemptRepository attempts;private final AuditService audit;private final NotificationService notifications;public DeliveryController(DeliveryAttemptRepository a,AuditService au,NotificationService n){attempts=a;audit=au;notifications=n;}@GetMapping("/{notificationId}") public Map<String,Object> get(@PathVariable UUID notificationId){Notification n=notifications.get(notificationId);if(!SecurityUtils.current().isPlatformAdmin()&&!n.getTenantId().equals(SecurityUtils.tenant()))throw new ApiException(HttpStatus.FORBIDDEN,"Tenant isolation violation");return Map.of("notification",n,"attempts",attempts.findByNotificationIdOrderByAttemptNumberAsc(notificationId),"audit",audit.find(notificationId));}}
+
+import com.example.notification.audit.*;
+import com.example.notification.common.ApiException;
+import com.example.notification.notification.*;
+import com.example.notification.security.SecurityUtils;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/v1/deliveries")
+@PreAuthorize("hasRole('TENANT_ADMIN')")
+public class DeliveryController {
+    private final DeliveryAttemptRepository attempts;
+    private final AuditService audit;
+    private final NotificationService notifications;
+
+    public DeliveryController(DeliveryAttemptRepository a, AuditService au, NotificationService n) {
+        attempts = a;
+        audit = au;
+        notifications = n;
+    }
+
+    @GetMapping("/{notificationId}")
+    public Map<String, Object> get(@PathVariable UUID notificationId) {
+        Notification n = notifications.get(notificationId);
+        if (!SecurityUtils.current().isPlatformAdmin()
+                && !n.getTenantId().equals(SecurityUtils.tenant()))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Tenant isolation violation");
+        return Map.of(
+                "notification",
+                n,
+                "attempts",
+                attempts.findByNotificationIdOrderByAttemptNumberAsc(notificationId),
+                "audit",
+                audit.find(notificationId));
+    }
+}

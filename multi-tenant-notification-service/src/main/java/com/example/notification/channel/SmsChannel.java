@@ -1,3 +1,25 @@
 package com.example.notification.channel;
-import com.example.notification.notification.Notification; import org.springframework.stereotype.Component;
-@Component public class SmsChannel implements NotificationChannel{public ChannelType type(){return ChannelType.SMS;} public DeliveryResult send(Notification n,String subject,String body){String r=n.getRecipient(); if(r==null||r.isBlank())return DeliveryResult.permanentFailure("INVALID_RECIPIENT","Recipient is empty"); if(r.contains("transient-failure"))return DeliveryResult.transientFailure("PROVIDER_TIMEOUT","Simulated transient provider failure"); if(r.contains("permanent-failure"))return DeliveryResult.permanentFailure("PROVIDER_REJECTED","Simulated permanent provider rejection"); return DeliveryResult.success("mock-sms-accepted");}}
+
+import com.example.notification.notification.Notification;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class SmsChannel implements NotificationChannel {
+    public ChannelType type() {
+        return ChannelType.SMS;
+    }
+
+    public DeliveryResult send(Notification n, String subject, String body) {
+        String r = n.getRecipient();
+        if (r == null || r.isBlank())
+            return DeliveryResult.permanentFailure("INVALID_RECIPIENT", "Recipient is empty");
+        if (r.contains("transient-failure"))
+            return DeliveryResult.transientFailure(
+                    "PROVIDER_TIMEOUT", "Simulated transient provider failure");
+        if (r.contains("permanent-failure"))
+            return DeliveryResult.permanentFailure(
+                    "PROVIDER_REJECTED", "Simulated permanent provider rejection");
+        return DeliveryResult.success("mock-sms-accepted");
+    }
+}
